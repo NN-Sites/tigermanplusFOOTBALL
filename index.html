@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אתגר הניחושים - בית"ר נגד מכבי</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Rubik', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+    }
+    .toast-enter {
+      animation: slideIn 0.4s ease-out forwards;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-between p-4 relative overflow-x-hidden">
+
+  <!-- התראות לייב בצד (קופצות רק כשמישהו באמת מגיש ניחוש) -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none max-w-xs w-full"></div>
+
+  <!-- Header -->
+  <header class="w-full max-w-xl flex items-center justify-between mb-6 glass-card p-4 rounded-2xl border border-slate-800 shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-tr from-yellow-500 to-amber-400 text-slate-950 p-2.5 rounded-xl font-black text-xl shadow-lg">
+        ⚽
+      </div>
+      <div>
+        <h1 class="text-xl font-black text-yellow-400">אתגר הניחושים</h1>
+        <p class="text-xs text-slate-400">בית"ר ירושלים ⚽ מכבי תל אביב</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-extrabold px-3 py-1.5 rounded-full animate-pulse">
+        🔴 LIVE
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Card -->
+  <main class="w-full max-w-xl space-y-6">
+    
+    <!-- טופס ניחוש -->
+    <div class="bg-slate-900 border-2 border-yellow-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
+      
+      <form id="predictionForm" class="space-y-5">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-slate-300 font-semibold text-sm">השם שלך (יופיע בלייב):</label>
+            <span id="charCount" class="text-xs text-slate-400 font-mono">0/7</span>
+          </div>
+          <input type="text" id="userName" maxlength="7" required placeholder="הכנס את שמך..." 
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition text-right">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-2 text-sm text-center">הניחוש שלך לתוצאה:</label>
+          <div class="grid grid-cols-5 gap-2 items-center bg-slate-800 p-3 rounded-2xl border border-slate-700">
+            <!-- Beitar -->
+            <div class="col-span-2 text-center">
+              <span class="block text-xs text-yellow-400 font-bold mb-1">בית"ר</span>
+              <input type="number" id="beitarScore" min="0" max="20" value="0" required
+                class="w-full text-center text-2xl font-black bg-slate-900 border border-slate-700 rounded-lg py-2 text-yellow-400 focus:outline-none focus:border-yellow-400">
+            </div>
+            
+            <div class="text-center font-black text-slate-500 text-xl">-</div>
+
+            <!-- Maccabi -->
+            <div class="col-span-2 text-center">
+              <span class="block text-xs text-blue-400 font-bold mb-1">מכבי</span>
+              <input type="number" id="maccabiScore" min="0" max="20" value="0" required
+                class="w-full text-center text-2xl font-black bg-slate-900 border border-slate-700 rounded-lg py-2 text-blue-400 focus:outline-none focus:border-blue-400">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn"
+          class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition duration-150 text-lg">
+          🔥 שלח ניחוש לשידור החי
+        </button>
+      </form>
+
+      <!-- הודעת הצלחה אם המשתמש כבר הימר -->
+      <div id="alreadyVotedMsg" class="hidden text-center py-6 space-y-3">
+        <div class="text-5xl">✅</div>
+        <h2 class="text-2xl font-black text-green-400">כבר ניחשת במשחק הזה!</h2>
+        <p id="userPredictionText" class="text-slate-200 text-lg font-bold bg-slate-800/80 py-2 rounded-xl border border-slate-700"></p>
+        <p class="text-slate-400 text-xs">מותר לנחש פעם אחת בלבד. שיהיה בהצלחה בלייב!</p>
+      </div>
+    </div>
+
+    <!-- סטטיסטיקות אמת מהפיירבייס -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-md font-bold text-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-yellow-400"></i> סטטיסטיקות ניחושים בזמן אמת
+        </h3>
+        <span class="text-xs text-slate-400">סה"כ: <strong id="totalCount" class="text-yellow-400">0</strong></span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="space-y-1.5">
+        <div class="flex justify-between text-xs font-bold text-slate-300">
+          <span class="text-yellow-400">בית"ר (<span id="pctBeitar">0</span>%)</span>
+          <span class="text-slate-400">תיקו (<span id="pctDraw">0</span>%)</span>
+          <span class="text-blue-400">מכבי (<span id="pctMaccabi">0</span>%)</span>
+        </div>
+        <div class="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden flex p-0.5 border border-slate-700">
+          <div id="barBeitar" class="bg-yellow-400 h-full transition-all duration-500" style="width: 0%"></div>
+          <div id="barDraw" class="bg-slate-500 h-full transition-all duration-500" style="width: 0%"></div>
+          <div id="barMaccabi" class="bg-blue-500 h-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- כרטיסי נתונים -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center pt-2">
+        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
+          <span class="block text-[11px] text-slate-400">בית"ר</span>
+          <span id="countBeitar" class="text-lg font-bold text-yellow-400">0</span>
+        </div>
+        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
+          <span class="block text-[11px] text-slate-400">תיקו</span>
+          <span id="countDraw" class="text-lg font-bold text-slate-300">0</span>
+        </div>
+        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
+          <span class="block text-[11px] text-slate-400">מכבי</span>
+          <span id="countMaccabi" class="text-lg font-bold text-blue-400">0</span>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-500/20 to-amber-500/10 p-2.5 rounded-xl border border-yellow-500/30">
+          <span class="block text-[11px] text-yellow-300 font-medium">נפוצה ביותר</span>
+          <span id="topScore" class="text-sm font-black text-yellow-400 mt-1">אין עדיין</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="mt-8 text-center text-xs text-slate-500">
+    אתגר הניחושים בלייב ⚽
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYPu5Fdlcbq-SPZmS-8SmFL3if2aM0lFo",
+      authDomain: "followbuildil.firebaseapp.com",
+      projectId: "followbuildil",
+      storageBucket: "followbuildil.firebasestorage.app",
+      messagingSenderId: "71902350555",
+      appId: "1:71902350555:web:15fdb3161d60c6cbc1d0fe",
+      measurementId: "G-186GSM3KKS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById('predictionForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const userNameInput = document.getElementById('userName');
+    const charCount = document.getElementById('charCount');
+    const alreadyVotedMsg = document.getElementById('alreadyVotedMsg');
+    const userPredictionText = document.getElementById('userPredictionText');
+    const toastContainer = document.getElementById('toastContainer');
+
+    let isInitialLoad = true;
+
+    // הגבלת 7 תווים
+    userNameInput.addEventListener('input', () => {
+      const len = userNameInput.value.length;
+      charCount.innerText = `${len}/7`;
+      charCount.className = len >= 7 ? "text-xs text-amber-400 font-mono font-bold" : "text-xs text-slate-400 font-mono";
+    });
+
+    // בדיקה אם המשתמש כבר ניחש במכשיר הזה
+    const savedPrediction = localStorage.getItem('has_predicted_game');
+    if (savedPrediction) {
+      form.classList.add('hidden');
+      userPredictionText.innerText = `הניחוש שלך: ${savedPrediction}`;
+      alreadyVotedMsg.classList.remove('hidden');
+    }
+
+    // שליחת ניחוש ל-Firebase
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (localStorage.getItem('has_predicted_game')) {
+        alert("ניתן לנחש פעם אחת בלבד!");
+        return;
+      }
+
+      const name = userNameInput.value.trim();
+      if (name.length > 7) {
+        alert("השם חייב להיות עד 7 תווים בלבד!");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "שולח...";
+
+      const beitar = Number(document.getElementById('beitarScore').value);
+      const maccabi = Number(document.getElementById('maccabiScore').value);
+      
+      let winner = "draw";
+      if (beitar > maccabi) winner = "beitar";
+      else if (maccabi > beitar) winner = "maccabi";
+
+      const predictionText = `${beitar} - ${maccabi}`;
+
+      try {
+        await addDoc(collection(db, "predictions"), {
+          name: name,
+          prediction: predictionText,
+          beitar: beitar,
+          maccabi: maccabi,
+          winner: winner,
+          timestamp: serverTimestamp()
+        });
+
+        localStorage.setItem('has_predicted_game', `${predictionText} (בית"ר-מכבי)`);
+
+        form.classList.add('hidden');
+        userPredictionText.innerText = `הניחוש שלך: ${predictionText} (בית"ר-מכבי)`;
+        alreadyVotedMsg.classList.remove('hidden');
+      } catch (error) {
+        alert("שגיאה בשליחה: " + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = "🔥 שלח ניחוש לשידור החי";
+      }
+    });
+
+    // הקפצת התראה בצד כשמישהו מגיש ניחוש בזמן אמת
+    function showLiveToast(name, prediction) {
+      const toast = document.createElement('div');
+      toast.className = 'toast-enter bg-slate-900/95 border border-yellow-500/40 p-3 rounded-2xl shadow-2xl flex items-center gap-3 text-white text-xs pointer-events-auto backdrop-blur-md';
+      
+      toast.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-extrabold text-sm shrink-0">
+          ${name[0]}
+        </div>
+        <div>
+          <p class="font-bold text-yellow-400">${name} ניחש כעת!</p>
+          <p class="text-slate-300">תוצאה: <strong class="text-white">${prediction}</strong></p>
+        </div>
+      `;
+
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => toast.remove(), 500);
+      }, 4000);
+    }
+
+    // הקשבה בזמן אמת לכל הנתונים מ-Firestore
+    const q = query(collection(db, "predictions"), orderBy("timestamp", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs;
+      const total = docs.length;
+
+      document.getElementById('totalCount').innerText = total;
+
+      if (total === 0) {
+        return;
+      }
+
+      let countBeitar = 0;
+      let countDraw = 0;
+      let countMaccabi = 0;
+      const scoresCount = {};
+
+      docs.forEach(doc => {
+        const data = doc.data();
+        
+        // חישוב מנצחים
+        if (data.beitar > data.maccabi) countBeitar++;
+        else if (data.maccabi > data.beitar) countMaccabi++;
+        else countDraw++;
+
+        // ספירת התוצאה השכיחה
+        const scoreKey = `${data.beitar}-${data.maccabi}`;
+        scoresCount[scoreKey] = (scoresCount[scoreKey] || 0) + 1;
+      });
+
+      // עדכון ה-UI של המספרים והאחוזים
+      const pctBeitar = Math.round((countBeitar / total) * 100) || 0;
+      const pctDraw = Math.round((countDraw / total) * 100) || 0;
+      const pctMaccabi = 100 - pctBeitar - pctDraw;
+
+      document.getElementById('countBeitar').innerText = countBeitar;
+      document.getElementById('countDraw').innerText = countDraw;
+      document.getElementById('countMaccabi').innerText = countMaccabi;
+
+      document.getElementById('pctBeitar').innerText = pctBeitar;
+      document.getElementById('pctDraw').innerText = pctDraw;
+      document.getElementById('pctMaccabi').innerText = pctMaccabi;
+
+      document.getElementById('barBeitar').style.width = pctBeitar + '%';
+      document.getElementById('barDraw').style.width = pctDraw + '%';
+      document.getElementById('barMaccabi').style.width = pctMaccabi + '%';
+
+      // מציאת התוצאה השכיחה ביותר
+      let topScoreKey = "";
+      let maxCount = 0;
+      for (const [score, count] of Object.entries(scoresCount)) {
+        if (count > maxCount) {
+          maxCount = count;
+          topScoreKey = score;
+        }
+      }
+      if (topScoreKey) {
+        const [b, m] = topScoreKey.split('-');
+        document.getElementById('topScore').innerText = `${b} - ${m}`;
+      }
+
+      // בדיקה אם נוסף ניחוש חדש בזמן אמת לאחר הטיעון הראשוני
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added" && !isInitialLoad) {
+          const newDoc = change.doc.data();
+          showLiveToast(newDoc.name, newDoc.prediction);
+        }
+      });
+
+      isInitialLoad = false;
+    });
+  </script>
+</body>
+</html>

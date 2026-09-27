@@ -1,339 +1,694 @@
+
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>אתגר הניחושים - בית"ר נגד מכבי</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800;900&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Rubik', sans-serif; }
-    .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-    }
-    .toast-enter {
-      animation: slideIn 0.4s ease-out forwards;
-    }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  </style>
-</head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-between p-4 relative overflow-x-hidden">
-
-  <!-- התראות לייב בצד (קופצות רק כשמישהו באמת מגיש ניחוש) -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none max-w-xs w-full"></div>
-
-  <!-- Header -->
-  <header class="w-full max-w-xl flex items-center justify-between mb-6 glass-card p-4 rounded-2xl border border-slate-800 shadow-xl">
-    <div class="flex items-center gap-3">
-      <div class="bg-gradient-to-tr from-yellow-500 to-amber-400 text-slate-950 p-2.5 rounded-xl font-black text-xl shadow-lg">
-        ⚽
-      </div>
-      <div>
-        <h1 class="text-xl font-black text-yellow-400">אתגר הניחושים</h1>
-        <p class="text-xs text-slate-400">בית"ר ירושלים ⚽ מכבי תל אביב</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-extrabold px-3 py-1.5 rounded-full animate-pulse">
-        🔴 LIVE
-      </span>
-    </div>
-  </header>
-
-  <!-- Main Card -->
-  <main class="w-full max-w-xl space-y-6">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TigerManPlus | ניחושי ישראל נגד אירלנד</title>
     
-    <!-- טופס ניחוש -->
-    <div class="bg-slate-900 border-2 border-yellow-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-      
-      <form id="predictionForm" class="space-y-5">
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="text-slate-300 font-semibold text-sm">השם שלך (יופיע בלייב):</label>
-            <span id="charCount" class="text-xs text-slate-400 font-mono">0/7</span>
-          </div>
-          <input type="text" id="userName" maxlength="7" required placeholder="הכנס את שמך..." 
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 transition text-right">
-        </div>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tigerOrange: '#ff6b00',
+                        tigerGold: '#ffb700',
+                        tigerDark: '#0a0d14',
+                        tigerCard: '#121824',
+                        israelBlue: '#0038b8',
+                        irelandGreen: '#169b62',
+                        chromaGreen: '#00FF00',
+                    },
+                    fontFamily: {
+                        rubik: ['Rubik', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'tiger-glow': '0 0 25px rgba(255, 107, 0, 0.35)',
+                        'israel-glow': '0 0 25px rgba(0, 56, 184, 0.35)',
+                        'emerald-glow': '0 0 25px rgba(22, 155, 98, 0.35)',
+                    }
+                }
+            }
+        }
+    </script>
 
-        <div>
-          <label class="block text-slate-300 font-semibold mb-2 text-sm text-center">הניחוש שלך לתוצאה:</label>
-          <div class="grid grid-cols-5 gap-2 items-center bg-slate-800 p-3 rounded-2xl border border-slate-700">
-            <!-- Beitar -->
-            <div class="col-span-2 text-center">
-              <span class="block text-xs text-yellow-400 font-bold mb-1">בית"ר</span>
-              <input type="number" id="beitarScore" min="0" max="20" value="0" required
-                class="w-full text-center text-2xl font-black bg-slate-900 border border-slate-700 rounded-lg py-2 text-yellow-400 focus:outline-none focus:border-yellow-400">
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: #07090e;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 107, 0, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 10% 80%, rgba(0, 56, 184, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(22, 155, 98, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Green Screen (OBS / Broadcast) Mode */
+        body.green-screen-mode {
+            background: #00FF00 !important;
+            background-image: none !important;
+            color: #ffffff !important;
+        }
+
+        body.green-screen-mode .hide-on-greenscreen {
+            display: none !important;
+        }
+
+        body.green-screen-mode .greenscreen-card {
+            background: rgba(10, 13, 20, 0.92) !important;
+            border-color: rgba(255, 107, 0, 0.5) !important;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        /* Toast Animation */
+        @keyframes slideDownIn {
+            0% { transform: translate(-50%, -120%); opacity: 0; }
+            100% { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        .toast-show {
+            animation: slideDownIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Tiger Gradient Text */
+        .text-tiger-gradient {
+            background: linear-gradient(135deg, #ffb700 0%, #ff6b00 50%, #ff3b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d111a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff6b00;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-16 antialiased selection:bg-orange-500 selection:text-white">
+
+    <div id="toastNotification" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden w-[92%] max-w-lg bg-slate-900/95 text-white px-5 py-4 rounded-2xl shadow-2xl border-2 border-tigerOrange backdrop-blur-xl flex items-center justify-between gap-4 toast-show">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-tigerOrange flex items-center justify-center text-slate-950 font-black shrink-0">
+                <i class="fa-solid fa-bolt text-lg"></i>
             </div>
-            
-            <div class="text-center font-black text-slate-500 text-xl">-</div>
-
-            <!-- Maccabi -->
-            <div class="col-span-2 text-center">
-              <span class="block text-xs text-blue-400 font-bold mb-1">מכבי</span>
-              <input type="number" id="maccabiScore" min="0" max="20" value="0" required
-                class="w-full text-center text-2xl font-black bg-slate-900 border border-slate-700 rounded-lg py-2 text-blue-400 focus:outline-none focus:border-blue-400">
+            <div>
+                <h4 class="text-xs text-amber-400 font-bold uppercase tracking-wider">התראת ניחוש בלייב</h4>
+                <p id="toastMessage" class="text-sm sm:text-base font-bold text-white">ניחוש חדש נקלט במערכת!</p>
             </div>
-          </div>
         </div>
-
-        <button type="submit" id="submitBtn"
-          class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-black py-4 rounded-xl shadow-lg transform active:scale-95 transition duration-150 text-lg">
-          🔥 שלח ניחוש לשידור החי
+        <button onclick="hideToast()" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
         </button>
-      </form>
-
-      <!-- הודעת הצלחה אם המשתמש כבר הימר -->
-      <div id="alreadyVotedMsg" class="hidden text-center py-6 space-y-3">
-        <div class="text-5xl">✅</div>
-        <h2 class="text-2xl font-black text-green-400">כבר ניחשת במשחק הזה!</h2>
-        <p id="userPredictionText" class="text-slate-200 text-lg font-bold bg-slate-800/80 py-2 rounded-xl border border-slate-700"></p>
-        <p class="text-slate-400 text-xs">מותר לנחש פעם אחת בלבד. שיהיה בהצלחה בלייב!</p>
-      </div>
     </div>
 
-    <!-- סטטיסטיקות אמת מהפיירבייס -->
-    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-      <div class="flex justify-between items-center">
-        <h3 class="text-md font-bold text-slate-200 flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-yellow-400"></i> סטטיסטיקות ניחושים בזמן אמת
-        </h3>
-        <span class="text-xs text-slate-400">סה"כ: <strong id="totalCount" class="text-yellow-400">0</strong></span>
-      </div>
-
-      <!-- Progress Bar -->
-      <div class="space-y-1.5">
-        <div class="flex justify-between text-xs font-bold text-slate-300">
-          <span class="text-yellow-400">בית"ר (<span id="pctBeitar">0</span>%)</span>
-          <span class="text-slate-400">תיקו (<span id="pctDraw">0</span>%)</span>
-          <span class="text-blue-400">מכבי (<span id="pctMaccabi">0</span>%)</span>
+    <header class="w-full max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 hide-on-greenscreen border-b border-slate-800/60 mb-6">
+        <!-- Logo & Branding -->
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-tigerOrange via-amber-500 to-amber-300 p-0.5 shadow-tiger-glow">
+                <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                    <i class="fa-solid fa-cat text-2xl text-tigerOrange"></i>
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-2xl font-black tracking-wider text-white">TIGERMAN</span>
+                    <span class="text-2xl font-black text-tigerOrange">PLUS</span>
+                    <span class="bg-tigerOrange/20 border border-tigerOrange/40 text-tigerOrange text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">OFFICIAL</span>
+                </div>
+                <p class="text-xs text-slate-400">זירת הניחושים הרשמית של הלייב 🇮🇱 ⚽ 🇮🇪</p>
+            </div>
         </div>
-        <div class="w-full h-3.5 bg-slate-800 rounded-full overflow-hidden flex p-0.5 border border-slate-700">
-          <div id="barBeitar" class="bg-yellow-400 h-full transition-all duration-500" style="width: 0%"></div>
-          <div id="barDraw" class="bg-slate-500 h-full transition-all duration-500" style="width: 0%"></div>
-          <div id="barMaccabi" class="bg-blue-500 h-full transition-all duration-500" style="width: 0%"></div>
+
+        <!-- Action Buttons (Live Share & Green Screen) -->
+        <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center">
+            <!-- Share Live Button -->
+            <button onclick="openShareModal()" class="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg shadow-red-600/20 transition flex items-center justify-center gap-2 border border-red-400/30">
+                <i class="fa-brands fa-youtube text-base animate-pulse"></i>
+                <span>שתף את הלייב</span>
+            </button>
+
+            <!-- Toggle Green Screen Button -->
+            <button onclick="toggleGreenScreen()" class="flex-1 sm:flex-none bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-video text-emerald-400"></i>
+                <span>מסך ירוק (OBS)</span>
+            </button>
         </div>
-      </div>
+    </header>
 
-      <!-- כרטיסי נתונים -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center pt-2">
-        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
-          <span class="block text-[11px] text-slate-400">בית"ר</span>
-          <span id="countBeitar" class="text-lg font-bold text-yellow-400">0</span>
+    <!-- Floating Exit Green Screen Button -->
+    <button id="exitGreenScreenBtn" onclick="toggleGreenScreen()" class="fixed top-4 left-4 z-50 hidden bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-2xl text-sm shadow-2xl border-2 border-white flex items-center gap-2">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> יציאה ממצב מסך ירוק
+    </button>
+
+    <main class="w-full max-w-6xl mx-auto px-4 space-y-8">
+
+        <!-- Match Score Banner Card -->
+        <div class="greenscreen-card bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-tigerOrange to-emerald-600"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <!-- Israel Team -->
+                <div class="flex items-center gap-4 w-full md:w-2/5 justify-start">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-800/80 border-2 border-blue-500/40 p-2 flex items-center justify-center shadow-israel-glow shrink-0">
+                        <span class="text-5xl sm:text-6xl select-none" role="img" aria-label="ישראל">🇮🇱</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">ישראל</h2>
+                        <span class="inline-block mt-1 px-3 py-0.5 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full border border-blue-500/30">נבחרת ישראל</span>
+                    </div>
+                </div>
+
+                <!-- Match Badge -->
+                <div class="flex flex-col items-center justify-center text-center my-2 md:my-0">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-tigerOrange/10 border border-tigerOrange/30 text-tigerOrange rounded-full text-xs font-black uppercase tracking-widest mb-2">
+                        <i class="fa-solid fa-fire text-amber-400"></i> המשחק של היום
+                    </div>
+                    <div class="text-4xl sm:text-6xl font-black text-slate-200 tracking-wider font-rubik">VS</div>
+                    <span id="liveVotesCounter" class="text-xs text-slate-400 mt-2 font-medium">טוען ניחושים...</span>
+                </div>
+
+                <!-- Ireland Team -->
+                <div class="flex items-center justify-end gap-4 w-full md:w-2/5 text-left flex-row-reverse md:flex-row">
+                    <div class="text-right md:text-left">
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">אירלנד</h2>
+                        <span class="inline-block mt-1 px-3 py-0.5 bg-emerald-500/20 text-emerald-300 text-xs font-bold rounded-full border border-emerald-500/30">נבחרת אירלנד</span>
+                    </div>
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-800/80 border-2 border-emerald-500/40 p-2 flex items-center justify-center shadow-emerald-glow shrink-0">
+                        <span class="text-5xl sm:text-6xl select-none" role="img" aria-label="אירלנד">🇮🇪</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
-          <span class="block text-[11px] text-slate-400">תיקו</span>
-          <span id="countDraw" class="text-lg font-bold text-slate-300">0</span>
+
+        <div id="votingSection" class="hide-on-greenscreen bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl relative">
+            <div class="mb-6 text-center">
+                <h3 class="text-2xl font-black text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-trophy text-tigerOrange"></i> מה הניחוש שלך למשחק?
+                </h3>
+                <p class="text-sm text-slate-400 mt-1">שלח את התוצאה שלך (ניתן לחזות פעם אחת בלבד!)</p>
+            </div>
+
+            <!-- Voted Banner (Shows after submission) -->
+            <div id="alreadyVotedCard" class="hidden bg-slate-800/90 border-2 border-amber-500/50 rounded-2xl p-6 text-center space-y-3">
+                <div class="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-tiger-glow">
+                    <i class="fa-solid fa-check-circle"></i>
+                </div>
+                <h4 class="text-xl font-bold text-white">הניחוש שלך נקלט במערכת TigerManPlus!</h4>
+                <div class="bg-slate-950 inline-block px-6 py-3 rounded-xl border border-slate-700">
+                    <p id="myPredictionDisplay" class="text-lg font-black text-tigerOrange"></p>
+                </div>
+                <p class="text-xs text-slate-400">תודה שהשתתפת! התוצאה שלך מופיעה בלוח הבלייב למטה.</p>
+            </div>
+
+            <!-- Main Prediction Form -->
+            <form id="predictionForm" onsubmit="submitPrediction(event)" class="space-y-6">
+                <!-- User Name Input -->
+                <div class="max-w-md mx-auto">
+                    <label for="userName" class="block text-sm font-semibold text-slate-300 mb-2">שם מלא / כינוי בשידור:</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-user-tag"></i>
+                        </div>
+                        <input type="text" id="userName" required placeholder="הכנס את שמך" 
+                            class="w-full pr-11 pl-4 py-3.5 bg-slate-800/90 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:ring-2 focus:ring-tigerOrange focus:border-transparent outline-none transition font-medium">
+                    </div>
+                </div>
+
+                <!-- Scores Selection -->
+                <div class="flex items-center justify-center gap-4 sm:gap-8 max-w-lg mx-auto">
+                    <!-- Israel Score Input -->
+                    <div class="flex-1 text-center bg-slate-800/60 p-4 rounded-2xl border border-blue-500/30">
+                        <span class="block text-xs font-bold text-blue-400 mb-2">ישראל 🇮🇱</span>
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" onclick="adjustScore('israelScore', -1)" class="w-10 h-10 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg flex items-center justify-center transition active:scale-95">-</button>
+                            <input type="number" id="israelScore" min="0" max="20" value="0" required readonly
+                                class="w-14 h-12 text-center text-2xl font-black bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none">
+                            <button type="button" onclick="adjustScore('israelScore', 1)" class="w-10 h-10 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg flex items-center justify-center transition active:scale-95">+</button>
+                        </div>
+                    </div>
+
+                    <div class="text-3xl font-black text-slate-600">:</div>
+
+                    <!-- Ireland Score Input -->
+                    <div class="flex-1 text-center bg-slate-800/60 p-4 rounded-2xl border border-emerald-500/30">
+                        <span class="block text-xs font-bold text-emerald-400 mb-2">אירלנד 🇮🇪</span>
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" onclick="adjustScore('irelandScore', -1)" class="w-10 h-10 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg flex items-center justify-center transition active:scale-95">-</button>
+                            <input type="number" id="irelandScore" min="0" max="20" value="0" required readonly
+                                class="w-14 h-12 text-center text-2xl font-black bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none">
+                            <button type="button" onclick="adjustScore('irelandScore', 1)" class="w-10 h-10 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg flex items-center justify-center transition active:scale-95">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center pt-2">
+                    <button type="submit" id="submitBtn" class="w-full max-w-md bg-gradient-to-r from-tigerOrange via-amber-500 to-tigerGold hover:from-amber-600 hover:to-tigerOrange text-slate-950 font-black py-4 px-8 rounded-xl shadow-tiger-glow transition duration-200 active:scale-98 flex items-center justify-center gap-2 mx-auto text-base">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>שלח ניחוש בלייב</span>
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
-          <span class="block text-[11px] text-slate-400">מכבי</span>
-          <span id="countMaccabi" class="text-lg font-bold text-blue-400">0</span>
+
+        <div class="greenscreen-card bg-slate-900/80 rounded-3xl p-6 border border-slate-800 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 text-center">
+                <span class="block text-xs font-semibold text-slate-400">סה"כ מנחשים</span>
+                <span id="statTotal" class="text-2xl sm:text-3xl font-black text-white">0</span>
+            </div>
+            <div class="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 text-center">
+                <span class="block text-xs font-semibold text-slate-400">ממוצע שערים (ישראל)</span>
+                <span id="statAvgIL" class="text-2xl sm:text-3xl font-black text-blue-400">0.0</span>
+            </div>
+            <div class="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 text-center">
+                <span class="block text-xs font-semibold text-slate-400">ממוצע שערים (אירלנד)</span>
+                <span id="statAvgIE" class="text-2xl sm:text-3xl font-black text-emerald-400">0.0</span>
+            </div>
+            <div class="bg-slate-800/40 p-4 rounded-2xl border border-slate-700/50 text-center">
+                <span class="block text-xs font-semibold text-slate-400">ניצחון לישראל</span>
+                <span id="statILWinPct" class="text-2xl sm:text-3xl font-black text-tigerGold">0%</span>
+            </div>
         </div>
-        <div class="bg-gradient-to-br from-yellow-500/20 to-amber-500/10 p-2.5 rounded-xl border border-yellow-500/30">
-          <span class="block text-[11px] text-yellow-300 font-medium">נפוצה ביותר</span>
-          <span id="topScore" class="text-sm font-black text-yellow-400 mt-1">אין עדיין</span>
+
+        <div class="greenscreen-card bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                    <h3 class="text-xl font-black text-white">לוח ניחושים בלייב</h3>
+                </div>
+                <span class="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">מתעדכן אוטומטית</span>
+            </div>
+
+            <!-- Predictions List Container -->
+            <div id="predictionsList" class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+                <div id="loadingState" class="text-center py-12 text-slate-400 space-y-3">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl text-tigerOrange"></i>
+                    <p class="text-sm">מתחבר לנתוני הבלייב...</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
 
-  </main>
+    </main>
 
-  <footer class="mt-8 text-center text-xs text-slate-500">
-    אתגר הניחושים בלייב ⚽
-  </footer>
+    <div id="shareModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl p-6 space-y-6 relative shadow-2xl">
+            <button onclick="closeShareModal()" class="absolute top-5 left-5 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-red-600/20 text-red-500 flex items-center justify-center mx-auto text-2xl border border-red-500/30">
+                    <i class="fa-brands fa-youtube"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">שתף את השידור החי</h3>
+                <p class="text-xs text-slate-400">שתף את הבלייב של TigerManPlus עם חברים!</p>
+            </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDYPu5Fdlcbq-SPZmS-8SmFL3if2aM0lFo",
-      authDomain: "followbuildil.firebaseapp.com",
-      projectId: "followbuildil",
-      storageBucket: "followbuildil.firebasestorage.app",
-      messagingSenderId: "71902350555",
-      appId: "1:71902350555:web:15fdb3161d60c6cbc1d0fe",
-      measurementId: "G-186GSM3KKS"
-    };
+            <!-- Social Share Buttons -->
+            <div class="grid grid-cols-2 gap-3">
+                <a id="whatsappShareBtn" href="#" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> וואטסאפ
+                </a>
+                <a id="telegramShareBtn" href="#" target="_blank" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 text-sm transition">
+                    <i class="fa-brands fa-telegram text-lg"></i> טלגרם
+                </a>
+            </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+            <!-- Direct Link Copy Box -->
+            <div class="space-y-2">
+                <label class="block text-xs font-semibold text-slate-400">קישור ישיר ללייב:</label>
+                <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <input id="shareLinkInput" type="text" readonly value="https://youtube.com/live/uBzwo-RhphY?feature=share" class="bg-transparent text-xs text-slate-300 w-full px-2 outline-none">
+                    <button onclick="copyShareLink()" class="bg-tigerOrange hover:bg-amber-500 text-slate-950 font-bold px-3 py-2 rounded-lg text-xs shrink-0 transition">
+                        <i class="fa-solid fa-copy"></i> העתק
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    const form = document.getElementById('predictionForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const userNameInput = document.getElementById('userName');
-    const charCount = document.getElementById('charCount');
-    const alreadyVotedMsg = document.getElementById('alreadyVotedMsg');
-    const userPredictionText = document.getElementById('userPredictionText');
-    const toastContainer = document.getElementById('toastContainer');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            setDoc, 
+            onSnapshot, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    let isInitialLoad = true;
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYPu5Fdlcbq-SPZmS-8SmFL3if2aM0lFo",
+            authDomain: "followbuildil.firebaseapp.com",
+            projectId: "followbuildil",
+            storageBucket: "followbuildil.firebasestorage.app",
+            messagingSenderId: "71902350555",
+            appId: "1:71902350555:web:15fdb3161d60c6cbc1d0fe",
+            measurementId: "G-186GSM3KKS"
+        };
 
-    // הגבלת 7 תווים
-    userNameInput.addEventListener('input', () => {
-      const len = userNameInput.value.length;
-      charCount.innerText = `${len}/7`;
-      charCount.className = len >= 7 ? "text-xs text-amber-400 font-mono font-bold" : "text-xs text-slate-400 font-mono";
-    });
+        // Initialize Firebase SDK
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-    // בדיקה אם המשתמש כבר ניחש במכשיר הזה
-    const savedPrediction = localStorage.getItem('has_predicted_game');
-    if (savedPrediction) {
-      form.classList.add('hidden');
-      userPredictionText.innerText = `הניחוש שלך: ${savedPrediction}`;
-      alreadyVotedMsg.classList.remove('hidden');
-    }
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'tigermanplus-israel-ireland';
+        const LOCAL_STORAGE_VOTE_KEY = `tigermanplus_voted_${appId}`;
 
-    // שליחת ניחוש ל-Firebase
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+        let currentUser = null;
+        let userHasVoted = false;
+        let lastKnownPredictionCount = -1;
 
-      if (localStorage.getItem('has_predicted_game')) {
-        alert("ניתן לנחש פעם אחת בלבד!");
-        return;
-      }
+        // Startup Logic
+        window.addEventListener('DOMContentLoaded', async () => {
+            setupShareLinks();
 
-      const name = userNameInput.value.trim();
-      if (name.length > 7) {
-        alert("השם חייב להיות עד 7 תווים בלבד!");
-        return;
-      }
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Firebase Auth Error:", err);
+            }
 
-      submitBtn.disabled = true;
-      submitBtn.innerText = "שולח...";
-
-      const beitar = Number(document.getElementById('beitarScore').value);
-      const maccabi = Number(document.getElementById('maccabiScore').value);
-      
-      let winner = "draw";
-      if (beitar > maccabi) winner = "beitar";
-      else if (maccabi > beitar) winner = "maccabi";
-
-      const predictionText = `${beitar} - ${maccabi}`;
-
-      try {
-        await addDoc(collection(db, "predictions"), {
-          name: name,
-          prediction: predictionText,
-          beitar: beitar,
-          maccabi: maccabi,
-          winner: winner,
-          timestamp: serverTimestamp()
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    checkLocalVoteState();
+                    listenToFirestorePredictions();
+                }
+            });
         });
 
-        localStorage.setItem('has_predicted_game', `${predictionText} (בית"ר-מכבי)`);
-
-        form.classList.add('hidden');
-        userPredictionText.innerText = `הניחוש שלך: ${predictionText} (בית"ר-מכבי)`;
-        alreadyVotedMsg.classList.remove('hidden');
-      } catch (error) {
-        alert("שגיאה בשליחה: " + error.message);
-        submitBtn.disabled = false;
-        submitBtn.innerText = "🔥 שלח ניחוש לשידור החי";
-      }
-    });
-
-    // הקפצת התראה בצד כשמישהו מגיש ניחוש בזמן אמת
-    function showLiveToast(name, prediction) {
-      const toast = document.createElement('div');
-      toast.className = 'toast-enter bg-slate-900/95 border border-yellow-500/40 p-3 rounded-2xl shadow-2xl flex items-center gap-3 text-white text-xs pointer-events-auto backdrop-blur-md';
-      
-      toast.innerHTML = `
-        <div class="w-8 h-8 rounded-full bg-yellow-400 text-slate-950 flex items-center justify-center font-extrabold text-sm shrink-0">
-          ${name[0]}
-        </div>
-        <div>
-          <p class="font-bold text-yellow-400">${name} ניחש כעת!</p>
-          <p class="text-slate-300">תוצאה: <strong class="text-white">${prediction}</strong></p>
-        </div>
-      `;
-
-      toastContainer.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => toast.remove(), 500);
-      }, 4000);
-    }
-
-    // הקשבה בזמן אמת לכל הנתונים מ-Firestore
-    const q = query(collection(db, "predictions"), orderBy("timestamp", "desc"));
-    
-    onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs;
-      const total = docs.length;
-
-      document.getElementById('totalCount').innerText = total;
-
-      if (total === 0) {
-        return;
-      }
-
-      let countBeitar = 0;
-      let countDraw = 0;
-      let countMaccabi = 0;
-      const scoresCount = {};
-
-      docs.forEach(doc => {
-        const data = doc.data();
-        
-        // חישוב מנצחים
-        if (data.beitar > data.maccabi) countBeitar++;
-        else if (data.maccabi > data.beitar) countMaccabi++;
-        else countDraw++;
-
-        // ספירת התוצאה השכיחה
-        const scoreKey = `${data.beitar}-${data.maccabi}`;
-        scoresCount[scoreKey] = (scoresCount[scoreKey] || 0) + 1;
-      });
-
-      // עדכון ה-UI של המספרים והאחוזים
-      const pctBeitar = Math.round((countBeitar / total) * 100) || 0;
-      const pctDraw = Math.round((countDraw / total) * 100) || 0;
-      const pctMaccabi = 100 - pctBeitar - pctDraw;
-
-      document.getElementById('countBeitar').innerText = countBeitar;
-      document.getElementById('countDraw').innerText = countDraw;
-      document.getElementById('countMaccabi').innerText = countMaccabi;
-
-      document.getElementById('pctBeitar').innerText = pctBeitar;
-      document.getElementById('pctDraw').innerText = pctDraw;
-      document.getElementById('pctMaccabi').innerText = pctMaccabi;
-
-      document.getElementById('barBeitar').style.width = pctBeitar + '%';
-      document.getElementById('barDraw').style.width = pctDraw + '%';
-      document.getElementById('barMaccabi').style.width = pctMaccabi + '%';
-
-      // מציאת התוצאה השכיחה ביותר
-      let topScoreKey = "";
-      let maxCount = 0;
-      for (const [score, count] of Object.entries(scoresCount)) {
-        if (count > maxCount) {
-          maxCount = count;
-          topScoreKey = score;
+        // Check if device/user already voted
+        function checkLocalVoteState() {
+            const savedVote = localStorage.getItem(LOCAL_STORAGE_VOTE_KEY);
+            if (savedVote) {
+                userHasVoted = true;
+                const vote = JSON.parse(savedVote);
+                displayAlreadyVotedState(vote.name, vote.israelScore, vote.irelandScore);
+            }
         }
-      }
-      if (topScoreKey) {
-        const [b, m] = topScoreKey.split('-');
-        document.getElementById('topScore').innerText = `${b} - ${m}`;
-      }
 
-      // בדיקה אם נוסף ניחוש חדש בזמן אמת לאחר הטיעון הראשוני
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === "added" && !isInitialLoad) {
-          const newDoc = change.doc.data();
-          showLiveToast(newDoc.name, newDoc.prediction);
+        // Display Already Voted Card
+        function displayAlreadyVotedState(name, il, ie) {
+            const form = document.getElementById('predictionForm');
+            const votedCard = document.getElementById('alreadyVotedCard');
+            const myPredictionDisplay = document.getElementById('myPredictionDisplay');
+
+            if (form && votedCard) {
+                form.classList.add('hidden');
+                votedCard.classList.remove('hidden');
+                myPredictionDisplay.innerText = `${name}: ישראל ${il} - ${ie} אירלנד`;
+            }
         }
-      });
 
-      isInitialLoad = false;
-    });
-  </script>
+        // Realtime Firestore Predictions Listener
+        function listenToFirestorePredictions() {
+            const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'predictions');
+
+            onSnapshot(collectionRef, (snapshot) => {
+                const predictions = [];
+                snapshot.forEach((docSnap) => {
+                    predictions.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                // Sort by timestamp descending
+                predictions.sort((a, b) => {
+                    const tA = a.createdAt?.seconds || 0;
+                    const tB = b.createdAt?.seconds || 0;
+                    return tB - tA;
+                });
+
+                // Toast notification on new prediction
+                if (lastKnownPredictionCount >= 0 && predictions.length > lastKnownPredictionCount) {
+                    const newest = predictions[0];
+                    if (newest) {
+                        window.triggerToast(`${newest.name} הימר הרגע: ישראל ${newest.israelScore} - ${newest.irelandScore} אירלנד!`);
+                    }
+                }
+                lastKnownPredictionCount = predictions.length;
+
+                renderPredictionsList(predictions);
+                updateLiveStats(predictions);
+
+            }, (error) => {
+                console.error("Firestore error:", error);
+                const list = document.getElementById('predictionsList');
+                if (list) {
+                    list.innerHTML = `<div class="text-center text-red-400 py-8">שגיאה בחיבור לנתוני הלייב</div>`;
+                }
+            });
+        }
+
+        // Render predictions list
+        function renderPredictionsList(list) {
+            const container = document.getElementById('predictionsList');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-500">
+                        <i class="fa-solid fa-ghost text-3xl mb-2"></i>
+                        <p>טרם נרשמו ניחושים. מנחשים ראשונים יופיעו כאן!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(item => {
+                const il = parseInt(item.israelScore) || 0;
+                const ie = parseInt(item.irelandScore) || 0;
+                
+                let outcomeTag = '<span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md font-bold">תיקו</span>';
+                if (il > ie) {
+                    outcomeTag = '<span class="text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2.5 py-1 rounded-md font-bold">ניצחון לישראל 🇮🇱</span>';
+                } else if (ie > il) {
+                    outcomeTag = '<span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-md font-bold">ניצחון לאירלנד 🇮🇪</span>';
+                }
+
+                let timeDisplay = 'בלייב';
+                if (item.createdAt?.seconds) {
+                    const d = new Date(item.createdAt.seconds * 1000);
+                    timeDisplay = d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                return `
+                    <div class="bg-slate-800/50 hover:bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 transition flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-tigerOrange to-amber-400 text-slate-950 font-black flex items-center justify-center text-base shadow">
+                                ${escapeHtml((item.name || '?').charAt(0))}
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-white text-sm sm:text-base">${escapeHtml(item.name || 'מנחש אנונימי')}</h4>
+                                    <span class="text-[10px] text-tigerOrange font-black bg-tigerOrange/10 px-1.5 py-0.5 rounded border border-tigerOrange/20">TMP</span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-slate-400">${timeDisplay}</span>
+                                    ${outcomeTag}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800">
+                            <span class="text-xs text-blue-400 font-bold hidden sm:inline">ישראל</span>
+                            <span class="text-xl font-black text-white font-rubik tracking-wider">${il} - ${ie}</span>
+                            <span class="text-xs text-emerald-400 font-bold hidden sm:inline">אירלנד</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update statistics
+        function updateLiveStats(list) {
+            const total = list.length;
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('liveVotesCounter').innerText = `${total} ניחושים נרשמו בלייב`;
+
+            if (total === 0) {
+                document.getElementById('statAvgIL').innerText = '0.0';
+                document.getElementById('statAvgIE').innerText = '0.0';
+                document.getElementById('statILWinPct').innerText = '0%';
+                return;
+            }
+
+            let sumIL = 0;
+            let sumIE = 0;
+            let ilWins = 0;
+
+            list.forEach(p => {
+                const il = parseInt(p.israelScore) || 0;
+                const ie = parseInt(p.irelandScore) || 0;
+                sumIL += il;
+                sumIE += ie;
+                if (il > ie) ilWins++;
+            });
+
+            document.getElementById('statAvgIL').innerText = (sumIL / total).toFixed(1);
+            document.getElementById('statAvgIE').innerText = (sumIE / total).toFixed(1);
+            document.getElementById('statILWinPct').innerText = `${Math.round((ilWins / total) * 100)}%`;
+        }
+
+        // Submit Prediction Handler
+        window.submitPrediction = async function(e) {
+            e.preventDefault();
+
+            if (userHasVoted) {
+                window.triggerToast("כבר שלחת ניחוש עבור משחק זה!");
+                return;
+            }
+
+            if (!currentUser) {
+                window.triggerToast("טוען חיבור ל-Firebase, נסה שוב בעוד רגע");
+                return;
+            }
+
+            const name = document.getElementById('userName').value.trim();
+            const israelScore = parseInt(document.getElementById('israelScore').value) || 0;
+            const irelandScore = parseInt(document.getElementById('irelandScore').value) || 0;
+
+            if (!name) {
+                window.triggerToast("אנא הכנס שם תקין");
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> שומר ניחוש...`;
+
+            try {
+                // Save prediction to Firestore using currentUser.uid as key
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'predictions', currentUser.uid);
+                const votePayload = {
+                    uid: currentUser.uid,
+                    name: name,
+                    israelScore: israelScore,
+                    irelandScore: irelandScore,
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(docRef, votePayload);
+
+                // Save locally
+                localStorage.setItem(LOCAL_STORAGE_VOTE_KEY, JSON.stringify({
+                    name,
+                    israelScore,
+                    irelandScore
+                }));
+
+                userHasVoted = true;
+                window.triggerToast("הניחוש שלך נרשם בהצלחה בבלייב! 🎉");
+                displayAlreadyVotedState(name, israelScore, irelandScore);
+
+            } catch (err) {
+                console.error("Save prediction error:", err);
+                window.triggerToast("שגיאה בשמירת הניחוש, נסה שוב");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>שלח ניחוש בלייב</span>`;
+            }
+        };
+
+        // Utility: Escape HTML
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Setup Social Share Links
+        function setupShareLinks() {
+            const liveUrl = "https://youtube.com/live/uBzwo-RhphY?feature=share";
+            const text = "בואו לנחש את תוצאת המשחק ישראל נגד אירלנד בלייב של TigerManPlus! 🇮🇱⚽🇮🇪";
+            
+            document.getElementById('whatsappShareBtn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + liveUrl)}`;
+            document.getElementById('telegramShareBtn').href = `https://t.me/share/url?url=${encodeURIComponent(liveUrl)}&text=${encodeURIComponent(text)}`;
+        }
+    </script>
+
+    <script>
+        // Adjust Score Controls
+        function adjustScore(id, delta) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            let val = parseInt(input.value) || 0;
+            val = Math.max(0, Math.min(20, val + delta));
+            input.value = val;
+        }
+
+        // Toggle Green Screen (Chroma Key #00FF00) Mode
+        function toggleGreenScreen() {
+            document.body.classList.toggle('green-screen-mode');
+            const exitBtn = document.getElementById('exitGreenScreenBtn');
+            if (document.body.classList.contains('green-screen-mode')) {
+                exitBtn.classList.remove('hidden');
+                triggerToast("מצב מסך ירוק הופעל עבור OBS והקלטות שידור");
+            } else {
+                exitBtn.classList.add('hidden');
+            }
+        }
+
+        // Share Modal Controls
+        function openShareModal() {
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        // Copy Share Link
+        function copyShareLink() {
+            const input = document.getElementById('shareLinkInput');
+            input.select();
+            document.execCommand('copy');
+            triggerToast("הקישור ללייב הועתק בהצלחה!");
+        }
+
+        // Trigger Top Banner Toast
+        let toastTimeout = null;
+        window.triggerToast = function(msg) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            if (!toast || !toastMsg) return;
+
+            toastMsg.innerText = msg;
+            toast.classList.remove('hidden');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4000);
+        };
+
+        function hideToast() {
+            document.getElementById('toastNotification').classList.add('hidden');
+        }
+    </script>
 </body>
 </html>
